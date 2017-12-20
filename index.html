@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Athlete Giphy</title>
+</head>
+<body>
+        <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <div id="athleteButtons" class="btn btn-primary">></div>
+            </div>
+            <br><br>
+                
+                <form class = "col-md-4" id="athleteSearch">
+                    <label for="athlete-input">Add an Athlete:</label>
+                    <input type="text" id="athlete-input">
+                    <input id="addAthlete" type="submit" value="submit">
+                </form>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="athletes"></div>
+            </div>
+        </div>
+    </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    // Event listener for all button elements
+    $(document).ready(function(){
+    var athleteList =["Derek Jeter", "Kobe Bryant", "Lebron James", "Richard Sherman", "Odell Beckham Jr", "Giancarlo Stanton", "Deandre Hopkins", "Aaron Judge", "Russel Wilson", "Kevin Durant", "Steph Curry", "Jarvis Landry", "Ben Roethlisberger", "Alshon Jeffery", "Todd Gurley",];
+   
+   $("#athleteButtons").on("click", "button", displayAthletes);
+     
+      function displayAthletes(){
+      var person = $(this).attr("data-name");
+    
+      // Constructing a URL to search Giphy for the name of the person who said the quote
+         var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        person + "&api_key=dc6zaTOxFJmzC&limit=10";
+      // Performing our AJAX GET request
+      $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+        // After the data comes back from the API  
+        .done(function(response) {
+          // Storing an array of results in the results variable
+          var results = response.data;
+          // Looping over every result item
+          for (var i = 0; i < results.length; i++) {
+            
+              var gifDiv = $("<div class='item'>");
+                
+              // Storing the result item's rating
+              var rating = results[i].rating;
+             
+              var p = $("<p>").text("Rating: " + rating);
+              
+              var athleteImage = $("<img>");
+              
+               athleteImage.attr("src", results[i].images.fixed_height.url);
+               
+               athleteImage.attr("data-still", results[i].images.fixed_height_still.url);
+              
+               athleteImage.attr("data-animate", results[i].images.fixed_height.url);
+              
+               athleteImage.attr("data-state", "still");
+              
+               athleteImage.addClass('athleteImage');
+              gifDiv.append(p);
+             
+              gifDiv.append(athleteImage);
+            $("#athletes").prepend(gifDiv);
+            }
+          
+                $(".athleteImage").on("click", function() {
+      
+                var state = $(this).attr("data-state");
+                  console.log(state);
+               if (state === "still") {
+              $(this).attr("src", $(this).attr("data-animate"));
+              $(this).attr("data-state", "animate");
+                }           
+                else {
+              $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "still");
+               }
+             });
+          });  
+        } 
+         
+          
+        
+    
+        $("#addAthlete").on("click", function(event){
+        event.preventDefault();
+ 
+        var newAthlete = $("#athlete-input").val();
+        
+        console.log("the new Athlete is: " + newAthlete)
+        
+        athleteList.push(newAthlete);
+        
+        renderButtons();
+      });
+    function renderButtons() {
+        
+        $("#athleteButtons").empty();
+  
+        for (var i = 0; i < athleteList.length; i++) {
+            var button = $("<button>")
+            
+            button.addClass("athletes");
+           button.attr("data-name", athleteList[i]);
+            button.text(athleteList[i]);
+            $("#athleteButtons").append(button);
+        }
+    }
+ renderButtons();
+    
+        
+});
+    
+        </script>
+      
+       
+      </style>
+</body>
+</html>
